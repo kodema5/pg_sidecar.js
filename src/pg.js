@@ -18,10 +18,10 @@ export let init = async (argv, work) => {
         onnotice: (msg) => console.log(msg.severity, msg.message),
     }
 
-    console.log(`> connecting to ${cfg.host}:${cfg.port}/${cfg.database}`)
+    console.log(`pg_sidecar.js connects to ${cfg.host}:${cfg.port}/${cfg.database}`)
     sql = postgres(cfg)
 
-    console.log(`> listening to ${argv.CHANNEL}`)
+    console.log(`pg_sidecar.js listens to ${argv.CHANNEL} channel`)
     listener = await sql.listen(argv.CHANNEL, work)
 }
 

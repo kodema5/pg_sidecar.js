@@ -2,8 +2,6 @@ import { argv, } from './argv.js'
 import * as lib from './lib.js'
 import * as pg from './pg.js'
 
-console.log(`PG_SIDECAR`)
-
 await lib.init(argv)
 
 let work = async (payload) => {
@@ -21,7 +19,7 @@ let work = async (payload) => {
 
     let fn = lib.Commands[cmd]
     if (!fn) {
-        console.log(`> ERR unrecognized cmd: ${cmd}`)
+        console.log(`pg_sidecar.js ERR unrecognized cmd: ${cmd}`)
         return
     }
 
@@ -34,9 +32,9 @@ let work = async (payload) => {
     }
 
     if (error) {
-        console.log(`[${cmd}] ERR ${error} for ${Date.now() - ts}ms`)
+        console.log(`pg_sidecar.js [${cmd}] ERR ${error} for ${Date.now() - ts}ms`)
     } else {
-        console.log(`[${cmd}] OK to ${call ? `${call}`: ''} for ${Date.now() - ts}ms`)
+        console.log(`pg_sidecar.js [${cmd}] OK ${call ? `to ${call}`: ''} for ${Date.now() - ts}ms`)
     }
 
     if (call) {
@@ -46,7 +44,7 @@ let work = async (payload) => {
             }'::jsonb) as x`
             await pg.exec(s)
         } catch(e) {
-            console.log(`[${cmd}] ERR fail to call ${call}(...): ${e.message}`)
+            console.log(`pg_sidecar.js [${cmd}] ERR fail to call ${call}(...): ${e.message}`)
         }
     }
 }

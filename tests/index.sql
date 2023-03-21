@@ -78,4 +78,4 @@ begin
 end;
 $$;
 
-select * from tests.request;
+-- select * from tests.request;

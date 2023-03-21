@@ -1,4 +1,6 @@
 import { fs, path } from './deps.js'
+import { argv } from './argv.js'
+import * as lib from './lib/index.js'
 
 let getPaths = async function* (paths=[]) {
     for (let p of paths) {
@@ -9,7 +11,7 @@ let getPaths = async function* (paths=[]) {
                 continue
             }
         } catch(e) {
-            console.log(`> unable to find ${p}.`)
+            console.log(`pg_sidecar.js unable to find ${p}.`)
             continue
         }
 
@@ -22,16 +24,22 @@ let getPaths = async function* (paths=[]) {
     }
 }
 
-export let Commands = {}
+export let Commands = Object.assign({
+    info: () => {
+        return {
+            name: argv.NAME,
+            commands: Object.keys(Commands),
+        }
+    }
+}, lib)
 
 let Stats = {}
 
 let loadLib = async (p) => {
-    console.log(`> loading lib ${p}`)
+    console.log(`pg_sidecar.js loads ${p}`)
 
     let s = await Deno.stat(p)
     if (Stats[p]?.mtime >= s.mtime) {
-        console.log(`> ${p}'s skipped.`)
         return
     }
 
@@ -46,19 +54,19 @@ let loadLib = async (p) => {
         Commands[n] = fn
         Stats[p] = s
     } catch(e) {
-        console.log(`> fail to load ${p}: ${e.message}`)
+        console.log(`pg_sidecar.js ERR fail to load ${p}: ${e.message}`)
     }
 }
 
 let removeLib = (p) => {
-    console.log(`> removing lib ${p}`)
+    console.log(`pg_sidecar.js removes ${p}`)
     delete Stats[p]
     let n = path.basename(p).split('.')[0]
     delete Commands[n]
 }
 
 let watchPath = async (ps) => {
-    console.log(`> watching ${ps}`)
+    console.log(`pg_sidecar.js watches ${ps}`)
     for await (let e of Deno.watchFs(ps)) {
         switch(e.kind) {
             case 'create':
@@ -72,13 +80,10 @@ let watchPath = async (ps) => {
     }
 }
 
-export let init = async ({
-    LIB=[],
-    WATCH=null
-} = {}) => {
+export let init = async () => {
 
-    let paths = ['./lib', ...LIB]
-
+    let { LIB, WATCH } = argv
+    let paths = [...LIB]
     for await (let p of getPaths(paths)) {
         await loadLib(p)
     }
