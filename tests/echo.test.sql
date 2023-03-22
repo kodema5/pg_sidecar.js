@@ -7,10 +7,10 @@ returns setof text
 language plpgsql
 as $$
 declare
-    r tests.request;
+    r tests.response;
 begin
-    select * into r from tests.request where id = 'test.echo';
-    return next ok(r.arg = r.data, 'able to echo');
+    select * into r from tests.response where id = 'test.echo';
+    return next ok(r.data = '{"a":123}', 'able to echo');
 end;
 $$;
 

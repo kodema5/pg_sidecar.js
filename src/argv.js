@@ -23,7 +23,6 @@ export let argv = Object.assign(
         NAME: Deno.hostname() + ':' + Deno.pid,
 
         LIB: [], // extra libraries
-        WATCH: null, // if to watch
         CHANNEL: 'pg_sidecar', // to listen to
     },
 
@@ -37,7 +36,9 @@ export let argv = Object.assign(
         .map( ([k,v]) => {
             let n = ArgFlags[k]
                 || k.toUpperCase().replaceAll('-','_')
-            return { [n]: v }
+            return { [n]: v}
         })
-        .reduce((x,a) => Object.assign(x,a), {})
+        .reduce((x,a) => {
+            return Object.assign(x,a)
+        }, {})
 )

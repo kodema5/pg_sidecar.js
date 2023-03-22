@@ -14,9 +14,9 @@ returns setof text
 language plpgsql
 as $$
 declare
-    r tests.request;
+    r tests.response;
 begin
-    select * into r from tests.request where id = 'test.ajax';
+    select * into r from tests.response where id = 'test.ajax';
     return next ok(r.data->'headers'->>'Host' = 'httpbin.org', 'able to ajax');
 end;
 $$;

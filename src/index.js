@@ -17,16 +17,15 @@ let work = async (payload) => {
         return
     }
 
-    let fn = lib.Commands[cmd]
-    if (!fn) {
-        console.log(`pg_sidecar.js ERR unrecognized cmd: ${cmd}`)
-        return
-    }
-
     let ts = Date.now()
     let data, error
     try {
-        data = await (lib.Commands[cmd])(arg)
+        let fn = lib.get(cmd)
+        if (!fn) {
+            throw new Error('unrecognized command')
+        }
+
+        data = await fn(arg)
     } catch(e) {
         error = e.message
     }
@@ -34,13 +33,13 @@ let work = async (payload) => {
     if (error) {
         console.log(`pg_sidecar.js [${cmd}] ERR ${error} for ${Date.now() - ts}ms`)
     } else {
-        console.log(`pg_sidecar.js [${cmd}] OK ${call ? `to ${call}`: ''} for ${Date.now() - ts}ms`)
+        console.log(`pg_sidecar.js [${cmd}] OK to ${call ? `${call}`: ''} for ${Date.now() - ts}ms`)
     }
 
     if (call) {
         try {
             let s = `select ${call}('${
-                JSON.stringify({id, data, error})
+                JSON.stringify({id, from:argv.NAME, data, error})
             }'::jsonb) as x`
             await pg.exec(s)
         } catch(e) {

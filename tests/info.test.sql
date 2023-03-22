@@ -7,9 +7,9 @@ returns setof text
 language plpgsql
 as $$
 declare
-    r tests.request;
+    r tests.response;
 begin
-    select * into r from tests.request where id = 'test.info';
+    select * into r from tests.response where id = 'test.info';
     return next ok(r.data->>'name' is not null, 'able get info of sidecar');
 end;
 $$;

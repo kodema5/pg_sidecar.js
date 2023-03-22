@@ -7,8 +7,7 @@ create table tests.request (
         primary key
         default md5(uuid_generate_v4()::text),
     "for" text
-        default '.' -- for any
-        ,           -- use ^aki:pid$ for exact
+        default '.', -- for any. use ^aki:pid$ for exact
     cmd text
         not null,
     arg jsonb,
@@ -16,25 +15,33 @@ create table tests.request (
         default 'tests.response',
     request_tz
         timestamp with time zone
-        default now(),
+        default now()
+);
 
+create table tests.response (
+    id text  not null,
+    "from" text not null,
     data jsonb,
     error jsonb,
     response_tz
         timestamp with time zone
+        default now()
 );
+
 
 create function tests.response (p jsonb)
     returns void
     language plpgsql
 as $$
 begin
-    update tests.request
-    set
-        data = p->'data',
-        error = p->'error',
-        response_tz = now()
-    where id = p->>'id';
+    insert into tests.response(
+        id, "from", data, error
+    ) values (
+        p->>'id',
+        p->>'from',
+        p->'data',
+        p->'error'
+    );
 end;
 $$;
 
@@ -66,6 +73,7 @@ create trigger tests_request_auto_send
 \ir ajax.test.sql
 \ir echo.test.sql
 \ir info.test.sql
+\ir load.test.sql
 
 -- wait until everything is done
 --
