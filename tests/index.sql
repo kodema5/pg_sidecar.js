@@ -1,6 +1,17 @@
+-- deno run -A --watch mod.js --on-listen="select tests.on_listen()"
 -- web-dev test tests/index.sql -w
 
 create extension if not exists "uuid-ossp" schema public;
+
+create function tests.on_listen()
+    returns text
+    language plpgsql
+as $$
+begin
+    return 'hello pg_sidecar';
+end;
+$$;
+
 
 create table tests.request (
     id text

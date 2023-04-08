@@ -24,6 +24,9 @@ export let argv = Object.assign(
 
         LIB: [], // extra libraries
         CHANNEL: 'pg_sidecar', // to listen to
+
+        ON_LISTEN: null, // sql to be executed once listen for initialization
+        ON_LISTEN_POLL: 1000, // 1 sec retry to initialize
     },
 
     // read from .env / .env.defaults
